@@ -64,4 +64,4 @@ Resets the configuration object to default values.
 
 # API documentation
 
-[jsConfig](doc/JsConfig.html)
+[jsConfig](https://opotonniee.github.io/js-config/doc/JsConfig.html)
