@@ -33,7 +33,7 @@ let cfg = new JsConfig({autosave: true, version: 2})
 
 ## Display configuration
 
-Display the configuration into a HTML <table> element (no styling):
+Display the configuration into a HTML `<table>` element (no styling):
 
 ```HTML
 <table id="config"></table>
