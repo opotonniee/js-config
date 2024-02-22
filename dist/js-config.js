@@ -225,7 +225,7 @@ class JsConfig {
           if (readonly) {
             input = val;
           } else  {
-            input = `<input type="text" id="${name}" value="${val}"/>`;
+            input = `<input type="text" id="${name}" value="${val.replaceAll('"', '&quot;')}"/>`;
           }
           break;
 
