@@ -16,7 +16,9 @@ class JsConfig {
   /**
    * Build a JsConfig object.
    * @param {*} settings - Optional object with optional settings:<br>
+   *  - listener {function} - callback when config is updated through the UI
    *  - autoSave {boolean} - Automatically save UI changes<br>
+   *  - capitalize {boolean} - Capitalize 1st letter of setting name in table
    *  - version {integer} - config compatible version. See {@link JsConfig#setConfig}
    */
   constructor(settings) {
@@ -24,11 +26,7 @@ class JsConfig {
     this._ = {};
     // Private field holding the config entries's description
     this._desc = {};
-    // listener
-    this._onChangeListener = undefined;
-    // Automatically save UI changes
-    this._autoSave = settings?.autoSave;
-    // Store config version in persisted data
+    this._options = settings;
     this._._version = settings?.version;
   }
 
@@ -172,7 +170,7 @@ class JsConfig {
    * @returns this
    */
   onChange(fn) {
-    this._onChangeListener = fn;
+    this._options.listener = fn;
     return this;
   }
 
@@ -183,8 +181,8 @@ class JsConfig {
    */
   change() {
     // notify changes
-    if (this._onChangeListener) {
-      this._onChangeListener(this._);
+    if (this._options.listener) {
+      this._options.listener(this._);
     }
     return this;
   }
@@ -204,10 +202,13 @@ class JsConfig {
     let jsc = this;
     for (let name in this._desc) {
       const desc = this._desc[name];
-      const trClass = desc.rowClass ?  `class="${desc.rowClass}"` : "";
-      tbody.insertAdjacentHTML("beforeend", `<tr ${trClass}></tr>`);
+      const trClass = desc.rowClass ? `class="${desc.rowClass}"` : "";
+      tbody.insertAdjacentHTML("beforeend", `<tr ${trClass} id="jsconfig-row-${name}"></tr>`);
       const tr = table.querySelector("tr:last-child");
-      tr.insertAdjacentHTML("beforeend", `<td title="${desc.readableDesc}">${name}:</td>`);
+      const shownName = this._options?.capitalize ?
+        (name.charAt(0).toUpperCase() + name.slice(1)).replaceAll("-", " ")
+        : name;
+      tr.insertAdjacentHTML("beforeend", `<td title="${desc.readableDesc}">${shownName}:</td>`);
       let input;
       let val = _[name];
       let type = desc.typeDesc;
@@ -216,7 +217,7 @@ class JsConfig {
         case JsConfig._TYPE_BOOL:
           if (readonly) {
             input = val ? "TRUE" : "FALSE";
-          } else  {
+          } else {
             input = `<input type="checkbox" id="${name}" ${val ? "checked" : ""}/>`;
           }
           break;
@@ -224,7 +225,7 @@ class JsConfig {
         case JsConfig._TYPE_TEXT:
           if (readonly) {
             input = val;
-          } else  {
+          } else {
             input = `<input type="text" id="${name}" value="${val.replaceAll('"', '&quot;')}"/>`;
           }
           break;
@@ -232,7 +233,7 @@ class JsConfig {
         case JsConfig._TYPE_NUM:
           if (readonly) {
             input = val;
-          } else  {
+          } else {
             let attrs = "";
             if (typeof type.min != undefined) {
               attrs += " min=${type.min}";
@@ -250,8 +251,8 @@ class JsConfig {
         case JsConfig._TYPE_ENUM:
           if (readonly) {
             input = val;
-          } else  {
-            let options = ""
+          } else {
+            let options = "";
             for (const optV of type.values) {
               const selected = val == optV ? "selected" : "";
               options += `<option value='${optV}' ${selected}>${optV}</option>`;
@@ -265,10 +266,11 @@ class JsConfig {
       }
 
       tr.insertAdjacentHTML("beforeend", `<td title="${desc.readableDesc}">${input}</td>`);
-      if (jsc._autoSave) {
+      if (jsc._options?.autoSave) {
         input = tr.querySelector("td:last-child").firstChild;
-        input.addEventListener("change", () => { jsc.readConfigTable() });
+        input.addEventListener("change", () => { jsc.readConfigTable(); });
       }
+      desc.input = input;
     }
     return this;
   }
@@ -287,7 +289,7 @@ class JsConfig {
     let _ = this._;
     for (const name in this._desc) {
       const desc = this._desc[name];
-      let input = table.querySelector("#" + name);
+      let input = desc.input;
       let type = desc.typeDesc;
       let v;
 
