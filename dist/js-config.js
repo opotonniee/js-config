@@ -335,7 +335,7 @@ class JsConfig {
         _[name] = v;
 
       } catch (error) {
-        input.focus();
+        input.focus && input.focus();
         throw `Cannot set "${name}" value: ${error}`;
       }
 
