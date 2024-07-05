@@ -270,7 +270,7 @@ class JsConfig {
         input = tr.querySelector("td:last-child").firstChild;
         input.addEventListener("change", () => { jsc.readConfigTable(); });
       }
-      desc.input = input;
+      desc.input = tr.querySelector("#" + name);
     }
     return this;
   }
