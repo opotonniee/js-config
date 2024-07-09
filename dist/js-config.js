@@ -266,11 +266,10 @@ class JsConfig {
       }
 
       tr.insertAdjacentHTML("beforeend", `<td title="${desc.readableDesc}">${input}</td>`);
-      if (jsc._options?.autoSave) {
-        input = tr.querySelector("td:last-child").firstChild;
-        input.addEventListener("change", () => { jsc.readConfigTable(); });
-      }
       desc.input = tr.querySelector("#" + name);
+      if (jsc._options?.autoSave) {
+        desc.input.addEventListener("change", () => { jsc.readConfigTable(); });
+      }
     }
     return this;
   }
