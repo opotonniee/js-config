@@ -93,6 +93,20 @@ class JsConfig {
   }
 
   /**
+   * Creates a multi-enum type description
+   *
+   * @param  {...any} - enumeration of possible string values
+   * @returns the created enum type description
+   */
+  static listMultiType(...values) {
+    return {
+      type: JsConfig._TYPE_ENUM,
+      values: values,
+      multiple: true
+    };
+  }
+
+  /**
    * Creates a numeric type description
    *
    * @param {number} [min] - min value
@@ -254,10 +268,15 @@ class JsConfig {
           } else {
             let options = "";
             for (const optV of type.values) {
-              const selected = val == optV ? "selected" : "";
+              let selected;
+              if (type.multiple) {
+                selected = val.includes(optV) ? "selected" : "";
+              } else {
+                selected = val == optV ? "selected" : "";
+              }
               options += `<option value='${optV}' ${selected}>${optV}</option>`;
             }
-            input = `<select id="${name}">${options}</select>`;
+            input = `<select id="${name}" ${type.multiple ? "multiple" : ""}>${options}</select>`;
           }
           break;
 
@@ -321,9 +340,16 @@ class JsConfig {
             break;
 
           case JsConfig._TYPE_ENUM:
-            v = input.value;
-            if (type.values.indexOf(v) < 0) {
-              throw `"${v}" is not a valid value`;
+            if (type.multiple) {
+              v = [];
+              document.querySelectorAll(`#${input.id} option:checked`).forEach(option => {
+                v.push(option.value);
+              });
+            } else {
+              v = input.value;
+              if (type.values.indexOf(v) < 0) {
+                throw `"${v}" is not a valid value`;
+              }
             }
             break;
 

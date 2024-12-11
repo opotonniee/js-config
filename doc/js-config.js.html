@@ -44,7 +44,9 @@ class JsConfig {
   /**
    * Build a JsConfig object.
    * @param {*} settings - Optional object with optional settings:&lt;br>
+   *  - listener {function} - callback when config is updated through the UI
    *  - autoSave {boolean} - Automatically save UI changes&lt;br>
+   *  - capitalize {boolean} - Capitalize 1st letter of setting name in table
    *  - version {integer} - config compatible version. See {@link JsConfig#setConfig}
    */
   constructor(settings) {
@@ -52,11 +54,7 @@ class JsConfig {
     this._ = {};
     // Private field holding the config entries's description
     this._desc = {};
-    // listener
-    this._onChangeListener = undefined;
-    // Automatically save UI changes
-    this._autoSave = settings?.autoSave;
-    // Store config version in persisted data
+    this._options = settings;
     this._._version = settings?.version;
   }
 
@@ -119,6 +117,20 @@ class JsConfig {
     return {
       type: JsConfig._TYPE_ENUM,
       values: values
+    };
+  }
+
+  /**
+   * Creates a multi-enum type description
+   *
+   * @param  {...any} - enumeration of possible string values
+   * @returns the created enum type description
+   */
+  static listMultiType(...values) {
+    return {
+      type: JsConfig._TYPE_ENUM,
+      values: values,
+      multiple: true
     };
   }
 
@@ -200,7 +212,7 @@ class JsConfig {
    * @returns this
    */
   onChange(fn) {
-    this._onChangeListener = fn;
+    this._options.listener = fn;
     return this;
   }
 
@@ -211,8 +223,8 @@ class JsConfig {
    */
   change() {
     // notify changes
-    if (this._onChangeListener) {
-      this._onChangeListener(this._);
+    if (this._options.listener) {
+      this._options.listener(this._);
     }
     return this;
   }
@@ -232,10 +244,13 @@ class JsConfig {
     let jsc = this;
     for (let name in this._desc) {
       const desc = this._desc[name];
-      const trClass = desc.rowClass ?  `class="${desc.rowClass}"` : "";
-      tbody.insertAdjacentHTML("beforeend", `&lt;tr ${trClass}>&lt;/tr>`);
+      const trClass = desc.rowClass ? `class="${desc.rowClass}"` : "";
+      tbody.insertAdjacentHTML("beforeend", `&lt;tr ${trClass} id="jsconfig-row-${name}">&lt;/tr>`);
       const tr = table.querySelector("tr:last-child");
-      tr.insertAdjacentHTML("beforeend", `&lt;td title="${desc.readableDesc}">${name}:&lt;/td>`);
+      const shownName = this._options?.capitalize ?
+        (name.charAt(0).toUpperCase() + name.slice(1)).replaceAll("-", " ")
+        : name;
+      tr.insertAdjacentHTML("beforeend", `&lt;td title="${desc.readableDesc}">${shownName}:&lt;/td>`);
       let input;
       let val = _[name];
       let type = desc.typeDesc;
@@ -244,7 +259,7 @@ class JsConfig {
         case JsConfig._TYPE_BOOL:
           if (readonly) {
             input = val ? "TRUE" : "FALSE";
-          } else  {
+          } else {
             input = `&lt;input type="checkbox" id="${name}" ${val ? "checked" : ""}/>`;
           }
           break;
@@ -252,15 +267,15 @@ class JsConfig {
         case JsConfig._TYPE_TEXT:
           if (readonly) {
             input = val;
-          } else  {
-            input = `&lt;input type="text" id="${name}" value="${val}"/>`;
+          } else {
+            input = `&lt;input type="text" id="${name}" value="${val.replaceAll('"', '&amp;quot;')}"/>`;
           }
           break;
 
         case JsConfig._TYPE_NUM:
           if (readonly) {
             input = val;
-          } else  {
+          } else {
             let attrs = "";
             if (typeof type.min != undefined) {
               attrs += " min=${type.min}";
@@ -278,13 +293,18 @@ class JsConfig {
         case JsConfig._TYPE_ENUM:
           if (readonly) {
             input = val;
-          } else  {
-            let options = ""
+          } else {
+            let options = "";
             for (const optV of type.values) {
-              const selected = val == optV ? "selected" : "";
+              let selected;
+              if (type.multiple) {
+                selected = val.includes(optV) ? "selected" : "";
+              } else {
+                selected = val == optV ? "selected" : "";
+              }
               options += `&lt;option value='${optV}' ${selected}>${optV}&lt;/option>`;
             }
-            input = `&lt;select id="${name}">${options}&lt;/select>`;
+            input = `&lt;select id="${name}" ${type.multiple ? "multiple" : ""}>${options}&lt;/select>`;
           }
           break;
 
@@ -293,9 +313,9 @@ class JsConfig {
       }
 
       tr.insertAdjacentHTML("beforeend", `&lt;td title="${desc.readableDesc}">${input}&lt;/td>`);
-      if (jsc._autoSave) {
-        input = tr.querySelector("td:last-child").firstChild;
-        input.addEventListener("change", () => { jsc.readConfigTable() });
+      desc.input = tr.querySelector("#" + name);
+      if (jsc._options?.autoSave) {
+        desc.input.addEventListener("change", () => { jsc.readConfigTable(); });
       }
     }
     return this;
@@ -315,7 +335,7 @@ class JsConfig {
     let _ = this._;
     for (const name in this._desc) {
       const desc = this._desc[name];
-      let input = table.querySelector("#" + name);
+      let input = desc.input;
       let type = desc.typeDesc;
       let v;
 
@@ -348,9 +368,16 @@ class JsConfig {
             break;
 
           case JsConfig._TYPE_ENUM:
-            v = input.value;
-            if (type.values.indexOf(v) &lt; 0) {
-              throw `"${v}" is not a valid value`;
+            if (type.multiple) {
+              v = [];
+              document.querySelectorAll(`#${input.id} option:checked`).forEach(option => {
+                v.push(option.value);
+              });
+            } else {
+              v = input.value;
+              if (type.values.indexOf(v) &lt; 0) {
+                throw `"${v}" is not a valid value`;
+              }
             }
             break;
 
@@ -361,7 +388,7 @@ class JsConfig {
         _[name] = v;
 
       } catch (error) {
-        input.focus();
+        input.focus &amp;&amp; input.focus();
         throw `Cannot set "${name}" value: ${error}`;
       }
 
@@ -388,7 +415,7 @@ class JsConfig {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sun Jan 14 2024 22:57:16 GMT+0100 (heure normale d’Europe centrale)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed Dec 11 2024 16:56:13 GMT+0100 (heure normale d’Europe centrale)
 </footer>
 
 <script> prettyPrint(); </script>

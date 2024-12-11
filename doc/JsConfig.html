@@ -105,7 +105,7 @@
 
             
 
-            <td class="description last">Optional object with optional settings:<br> - autoSave {boolean} - Automatically save UI changes<br> - version {integer} - config compatible version. See <a href="JsConfig.html#setConfig">JsConfig#setConfig</a></td>
+            <td class="description last">Optional object with optional settings:<br> - listener {function} - callback when config is updated through the UI - autoSave {boolean} - Automatically save UI changes<br> - capitalize {boolean} - Capitalize 1st letter of setting name in table - version {integer} - config compatible version. See <a href="JsConfig.html#setConfig">JsConfig#setConfig</a></td>
         </tr>
 
     
@@ -210,7 +210,7 @@
 
 
 <div class="description">
-    Declares an additional config entry, setting initial/default values.Triggers the change listener invocation.
+    Declares an additional config entry, setting initial/default values.Triggers the change listener invocation.
 </div>
 
 
@@ -303,7 +303,7 @@
 
             
 
-            <td class="description last">Type of the config value, as returned by                    boolType(), textType(), numType(), or EnumType()</td>
+            <td class="description last">Type of the config value, as returned by                    boolType(), textType(), numType(), or EnumType()</td>
         </tr>
 
     
@@ -447,7 +447,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line47">line 47</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line45">line 45</a>
     </li></ul></dd>
     
 
@@ -545,7 +545,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line184">line 184</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line196">line 196</a>
     </li></ul></dd>
     
 
@@ -692,7 +692,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line174">line 174</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line186">line 186</a>
     </li></ul></dd>
     
 
@@ -746,7 +746,7 @@
 
 
 <div class="description">
-    Sets the config with the value from the table.Triggers the change listener invocation.
+    Sets the config with the value from the table.Triggers the change listener invocation.
 </div>
 
 
@@ -839,7 +839,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line283">line 283</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line303">line 303</a>
     </li></ul></dd>
     
 
@@ -893,7 +893,7 @@
 
 
 <div class="description">
-    Resets the config to the default values.Triggers the change listener invocation.
+    Resets the config to the default values.Triggers the change listener invocation.
 </div>
 
 
@@ -937,7 +937,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line157">line 157</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line169">line 169</a>
     </li></ul></dd>
     
 
@@ -991,7 +991,7 @@
 
 
 <div class="description">
-    Sets the config with pre-defined values, overriding defaults.If the JsConfig object has a version, the setting is only applied ifthe newConfig object has the same version value.Triggers the change listener invocation when changes were applied.
+    Sets the config with pre-defined values, overriding defaults.If the JsConfig object has a version, the setting is only applied ifthe newConfig object has the same version value.Triggers the change listener invocation when changes were applied.
 </div>
 
 
@@ -1084,7 +1084,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line123">line 123</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line135">line 135</a>
     </li></ul></dd>
     
 
@@ -1286,7 +1286,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line199">line 199</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line211">line 211</a>
     </li></ul></dd>
     
 
@@ -1384,7 +1384,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line65">line 65</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line63">line 63</a>
     </li></ul></dd>
     
 
@@ -1414,6 +1414,165 @@
         
 <div class="param-desc">
     the created boolean type description
+</div>
+
+
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".listMultiType"><span class="type-signature">(static) </span>listMultiType<span class="signature">(&hellip;values)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creates a multi-enum type description
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>values</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">any</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last">enumeration of possible string values</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line101">line 101</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    the created enum type description
 </div>
 
 
@@ -1543,7 +1702,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line90">line 90</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line88">line 88</a>
     </li></ul></dd>
     
 
@@ -1768,7 +1927,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line105">line 105</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line117">line 117</a>
     </li></ul></dd>
     
 
@@ -1927,7 +2086,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line77">line 77</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line75">line 75</a>
     </li></ul></dd>
     
 
@@ -1989,7 +2148,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sun Jan 14 2024 22:57:16 GMT+0100 (heure normale d’Europe centrale)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed Dec 11 2024 16:56:13 GMT+0100 (heure normale d’Europe centrale)
 </footer>
 
 <script> prettyPrint(); </script>

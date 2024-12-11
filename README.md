@@ -25,6 +25,7 @@ Create a configuration object with 3 settings of type boolean, enumeration (list
 let cfg = new JsConfig({autosave: true, version: 2})
   .add("setting1", JsConfig.boolType(), false, "Activate debug features")
   .add("countdown", JsConfig.listType("graphic", "txt"), "graphic", "alternative UIs for countdowns")
+  .add("style", JsConfig.listMultiType("bold", "italic", "subscript", "superscript"), ["bold", "italic"], "text style")
   .add("mobLink", JsConfig.textType(".*"), "https://idcfido.demo.gemalto.com/enroll?token=*REGCODE*", "URL to trigger app with registration link")
   .add("authenticationTimeout", JsConfig.numType(0, 3600, 10), 120, "Number of seconds before FIDO authentication times out")
   .onChange(cfg => localStorage.setItem("my_app_config", JSON.stringify(cfg)))
