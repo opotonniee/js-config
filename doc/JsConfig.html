@@ -303,7 +303,7 @@
 
             
 
-            <td class="description last">Type of the config value, as returned by                    boolType(), textType(), numType(), or EnumType()</td>
+            <td class="description last">Type of the config value, as returned by                    boolType(), textType(), numType(), listType(), or listMultiType()</td>
         </tr>
 
     
@@ -447,7 +447,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line45">line 45</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line47">line 47</a>
     </li></ul></dd>
     
 
@@ -545,7 +545,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line196">line 196</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line208">line 208</a>
     </li></ul></dd>
     
 
@@ -692,7 +692,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line186">line 186</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line198">line 198</a>
     </li></ul></dd>
     
 
@@ -839,7 +839,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line303">line 303</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line315">line 315</a>
     </li></ul></dd>
     
 
@@ -937,7 +937,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line169">line 169</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line181">line 181</a>
     </li></ul></dd>
     
 
@@ -1084,7 +1084,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line135">line 135</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line147">line 147</a>
     </li></ul></dd>
     
 
@@ -1286,7 +1286,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line211">line 211</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line223">line 223</a>
     </li></ul></dd>
     
 
@@ -1384,7 +1384,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line63">line 63</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line65">line 65</a>
     </li></ul></dd>
     
 
@@ -1430,7 +1430,7 @@
     
 
     
-    <h4 class="name" id=".listMultiType"><span class="type-signature">(static) </span>listMultiType<span class="signature">(&hellip;values)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".listMultiType"><span class="type-signature">(static) </span>listMultiType<span class="signature">(values, min<span class="signature-attributes">opt</span>, max<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
     
 
     
@@ -1438,7 +1438,7 @@
 
 
 <div class="description">
-    Creates a multi-enum type description
+    Creates a multi-list type descriptionSelected configuration can be 0 to N values of the listed values.
 </div>
 
 
@@ -1482,7 +1482,7 @@
             <td class="type">
             
                 
-<span class="param-type">any</span>
+<span class="param-type">Array.&lt;string></span>
 
 
             
@@ -1495,14 +1495,78 @@
                 
 
                 
-                    &lt;repeatable><br>
+                </td>
+            
+
+            
+
+            <td class="description last">list of possible string values</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>min</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
                 
                 </td>
             
 
             
 
-            <td class="description last">enumeration of possible string values</td>
+            <td class="description last">minimum number of configured values</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>max</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">maximum number of configured values</td>
         </tr>
 
     
@@ -1543,7 +1607,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line101">line 101</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line107">line 107</a>
     </li></ul></dd>
     
 
@@ -1572,7 +1636,7 @@
 
         
 <div class="param-desc">
-    the created enum type description
+    the created list type description
 </div>
 
 
@@ -1597,7 +1661,7 @@
 
 
 <div class="description">
-    Creates an enum type description
+    Creates an list type description. Selected configuration must be exactly one value of the listed values.
 </div>
 
 
@@ -1661,7 +1725,7 @@
 
             
 
-            <td class="description last">enumeration of possible string values</td>
+            <td class="description last">list of possible string values</td>
         </tr>
 
     
@@ -1702,7 +1766,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line88">line 88</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line91">line 91</a>
     </li></ul></dd>
     
 
@@ -1731,7 +1795,7 @@
 
         
 <div class="param-desc">
-    the created enum type description
+    the created list type description
 </div>
 
 
@@ -1927,7 +1991,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line117">line 117</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line129">line 129</a>
     </li></ul></dd>
     
 
@@ -2086,7 +2150,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line75">line 75</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line77">line 77</a>
     </li></ul></dd>
     
 
@@ -2148,7 +2212,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Wed Dec 11 2024 16:56:13 GMT+0100 (heure normale d’Europe centrale)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Dec 12 2024 11:44:52 GMT+0100 (heure normale d’Europe centrale)
 </footer>
 
 <script> prettyPrint(); </script>

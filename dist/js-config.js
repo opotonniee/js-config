@@ -8,10 +8,12 @@ class JsConfig {
   // Assuming some browsers still do not have private and static fields
 
   // config field types
-  static get _TYPE_BOOL() { return 0; }
-  static get _TYPE_TEXT() { return 1; }
-  static get _TYPE_NUM() { return 2; }
-  static get _TYPE_ENUM() { return 3; }
+  static get #TYPE_BOOL() { return 0; }
+  static get #TYPE_TEXT() { return 1; }
+  static get #TYPE_NUM() { return 2; }
+  static get #TYPE_LIST() { return 3; }
+  
+  static #isNum(value) { return typeof value === 'number'; }
 
   /**
    * Build a JsConfig object.
@@ -36,7 +38,7 @@ class JsConfig {
    *
    * @param {string} name - Name of the config item
    * @param {object} typeDesc - Type of the config value, as returned by
-   *                     boolType(), textType(), numType(), or EnumType()
+   *                     boolType(), textType(), numType(), listType(), or listMultiType()
    * @param {boolean|string|number} defaultValue - Default config value
    * @param {string} [readableDesc] - Description for this config entry, will be displayed as a tooltip
    * @param {string} [rowClass] - HTML class of the table row for this config
@@ -62,7 +64,7 @@ class JsConfig {
    */
   static boolType() {
     return {
-      type: JsConfig._TYPE_BOOL
+      type: JsConfig.#TYPE_BOOL
     };
   }
 
@@ -74,35 +76,45 @@ class JsConfig {
    */
   static textType(pattern) {
     return {
-      type: JsConfig._TYPE_TEXT,
+      type: JsConfig.#TYPE_TEXT,
       pattern: pattern
     };
   }
 
   /**
-   * Creates an enum type description
+   * Creates an list type description. 
+   * Selected configuration must be exactly one value of the listed values.
    *
-   * @param  {...any} - enumeration of possible string values
-   * @returns the created enum type description
+   * @param  {...any} values - list of possible string values
+   * @returns the created list type description
    */
   static listType(...values) {
     return {
-      type: JsConfig._TYPE_ENUM,
+      type: JsConfig.#TYPE_LIST,
       values: values
     };
   }
 
   /**
-   * Creates a multi-enum type description
+   * Creates a multi-list type description
+   * Selected configuration can be 0 to N values of the listed values.
    *
-   * @param  {...any} - enumeration of possible string values
-   * @returns the created enum type description
+   * @param  {string[]} values - list of possible string values
+   * @param  {number} [min] - minimum number of configured values
+   * @param  {number} [max] - maximum number of configured values
+   * @returns the created list type description
    */
-  static listMultiType(...values) {
+  static listMultiType(values, min, max) {
+    if ((JsConfig.#isNum(min) && min > values.length) || (JsConfig.#isNum(max) && max < min)) {
+      throw "Invalid min/max";
+    }
     return {
-      type: JsConfig._TYPE_ENUM,
+      type: JsConfig.#TYPE_LIST,
       values: values,
-      multiple: true
+      multiple: true,
+      min: min,
+      max: max,
+      eq: (v1, v2) => JSON.stringify(v1?.toSorted()) == JSON.stringify(v2?.toSorted())
     };
   }
 
@@ -116,7 +128,7 @@ class JsConfig {
    */
   static numType(min, max, step) {
     return {
-      type: JsConfig._TYPE_NUM,
+      type: JsConfig.#TYPE_NUM,
       min: min,
       max: max,
       step: step
@@ -150,7 +162,7 @@ class JsConfig {
       for (let name in newConfig) {
         const value = newConfig[name];
         if (typeof _desc[name] !== "undefined") {
-          isChanged = _[name] != value;
+          isChanged = _desc[name]?.eq ? !_desc[name]?.eq(_[name], value) : _[name] != value;
           _[name] = value;
         }
       }
@@ -228,7 +240,7 @@ class JsConfig {
       let type = desc.typeDesc;
       switch (type.type) {
 
-        case JsConfig._TYPE_BOOL:
+        case JsConfig.#TYPE_BOOL:
           if (readonly) {
             input = val ? "TRUE" : "FALSE";
           } else {
@@ -236,7 +248,7 @@ class JsConfig {
           }
           break;
 
-        case JsConfig._TYPE_TEXT:
+        case JsConfig.#TYPE_TEXT:
           if (readonly) {
             input = val;
           } else {
@@ -244,15 +256,15 @@ class JsConfig {
           }
           break;
 
-        case JsConfig._TYPE_NUM:
+        case JsConfig.#TYPE_NUM:
           if (readonly) {
             input = val;
           } else {
             let attrs = "";
-            if (typeof type.min != undefined) {
+            if (JsConfig.#isNum(type.min)) {
               attrs += " min=${type.min}";
             }
-            if (typeof type.max != undefined) {
+            if (JsConfig.#isNum(type.max)) {
               attrs += " max=${type.max}";
             }
             if (typeof type.step != undefined) {
@@ -262,7 +274,7 @@ class JsConfig {
           }
           break;
 
-        case JsConfig._TYPE_ENUM:
+        case JsConfig.#TYPE_LIST:
           if (readonly) {
             input = val;
           } else {
@@ -315,11 +327,11 @@ class JsConfig {
 
         switch (type.type) {
 
-          case JsConfig._TYPE_BOOL:
+          case JsConfig.#TYPE_BOOL:
             v = input.checked;
             break;
 
-          case JsConfig._TYPE_TEXT:
+          case JsConfig.#TYPE_TEXT:
             v = input.value.trim();
             if (type.pattern) {
               if (!new RegExp(type.pattern).test(v)) {
@@ -328,23 +340,29 @@ class JsConfig {
             }
             break;
 
-          case JsConfig._TYPE_NUM:
+          case JsConfig.#TYPE_NUM:
             v = parseFloat(input.value);
             if (
               (isNaN(v)) ||
-              (typeof type.min !== "undefined" && v < type.min) ||
-              (typeof type.max !== "undefined" && v > type.max)
+              (JsConfig.#isNum(type.min) && v < type.min) ||
+              (JsConfig.#isNum(type.max) && v > type.max)
             ) {
               throw `"${v}" not in valid range (${type.min} to ${type.max})`;
             }
             break;
 
-          case JsConfig._TYPE_ENUM:
+          case JsConfig.#TYPE_LIST:
             if (type.multiple) {
               v = [];
               document.querySelectorAll(`#${input.id} option:checked`).forEach(option => {
                 v.push(option.value);
               });
+              if (JsConfig.#isNum(type.min) && v.length < type.min) {
+                throw `At least ${type.min} value must be selected`;
+              }
+              if (JsConfig.#isNum(type.max) && v.length > type.max) {
+                throw `There cannot be more than ${type.max} value selected`;
+              }
             } else {
               v = input.value;
               if (type.values.indexOf(v) < 0) {
