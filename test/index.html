@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>jsConfig example</title>
+</head>
+
+<body>
+  <h2>jsConfig example</h2>
+  <table id="config"></table>
+  <div id="buttons">
+    <button id="save">Save</button>
+    <button id="reset">Reset</button>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/cash-dom/dist/cash.min.js"></script>
+  <script src="../dist/js-config.js"></script>
+</body>
+
+<script>
+  let jsCfg;
+  $(function () {
+
+    let cfgTable = $("#config")[0];
+
+    function createConfig(autosave) {
+      
+      function refreshAutoSave(newValue) {
+        if (newValue != autosave) {
+          console.log(newValue);
+          $("#save").prop("disabled", newValue);
+          createConfig(newValue);
+          return true;
+        }
+      }
+      
+      jsCfg = new JsConfig({ autoSave: autosave, version: 1 })
+        .add("Name", JsConfig.textType(""), "John Doe", "A name")
+        .add("Gender", JsConfig.listType("Male", "Female", "Bi", "Trans", "Queer", "Other"), "Bi", "A gender")
+        .add("Diet", JsConfig.listMultiType(["Vege", "Halal", "Kosher"]), [], "Dietary constraints")
+        .add("Age", JsConfig.numType(0, 130), 30, "An age")
+        .add("Alive", JsConfig.boolType(), true, "Is that person alive?")
+        .add("AutoSave", JsConfig.boolType(), autosave, "Save config on each change")
+        .setConfig(localStorage.getItem("jsconfig"))
+        .onChange(newCfg => {
+          localStorage.setItem("jsconfig", JSON.stringify(newCfg));
+          refreshAutoSave(newCfg.AutoSave);
+        });
+      if (!refreshAutoSave(jsCfg.value.AutoSave)) {
+        cfgTable.innerHTML = "";
+        jsCfg.showConfigTable(cfgTable);
+      }
+    }
+    createConfig(false);
+
+    $("#save").on("click", () => {
+      jsCfg.readConfigTable(cfgTable);
+    });
+    $("#reset").on("click", () => {
+      jsCfg.resetToDefault();
+      location.reload();
+    });
+
+  });
+</script>
+
+</html>

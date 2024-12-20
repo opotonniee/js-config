@@ -12,8 +12,12 @@ class JsConfig {
   static get #TYPE_TEXT() { return 1; }
   static get #TYPE_NUM() { return 2; }
   static get #TYPE_LIST() { return 3; }
-  
+
   static #isNum(value) { return typeof value === 'number'; }
+  static #isSet(value) { return value !== null && value !== undefined; }
+
+  #options;
+  #items;
 
   /**
    * Build a JsConfig object.
@@ -24,12 +28,49 @@ class JsConfig {
    *  - version {integer} - config compatible version. See {@link JsConfig#setConfig}
    */
   constructor(settings) {
-    // The config data object. Use `new JsConfig()._` to access it
-    this._ = {};
     // Private field holding the config entries's description
-    this._desc = {};
-    this._options = settings;
-    this._._version = settings?.version;
+    this.#items = {
+      _version: {
+        value: settings?.version
+      }
+    };
+    this.#options = settings;
+  }
+
+  #v = {};
+  /**
+   * Getter to access getter and setter for each config values. For example:
+   *   <configObject>.value.<configName> // returns the <configName> value
+   *   <configObject>.value.<configName> = 3 // sets the <configName> value, and persist it. Throws an error is value does not comply to the configuration definition.
+   */
+  get value() {
+    return this.#v;
+  }
+  #addProperty(name) {
+    let _this = this;
+    Object.defineProperty(this.#v, name, {
+      get() {
+        return _this.#items[name]?.value;
+      },
+      set(value) {
+        let item = _this.#items[name];
+        if (item && item?.typeDesc) {
+          item.set(value);
+        }
+      }
+    });
+  }
+
+  /**
+   * Return a cloned copy of the full config object value
+   */
+  toJSON() {
+    const res={};
+    for (let name in this.#items) {
+      let val = this.#items[name].value;
+      res[name] = Array.isArray(val) ? [...val] : val;
+    }
+    return res;
   }
 
   /**
@@ -39,19 +80,69 @@ class JsConfig {
    * @param {string} name - Name of the config item
    * @param {object} typeDesc - Type of the config value, as returned by
    *                     boolType(), textType(), numType(), listType(), or listMultiType()
-   * @param {boolean|string|number} defaultValue - Default config value
+   * @param {boolean|string|number|array} defaultValue - Default config value
    * @param {string} [readableDesc] - Description for this config entry, will be displayed as a tooltip
    * @param {string} [rowClass] - HTML class of the table row for this config
    * @returns this
    */
   add(name, typeDesc, defaultValue, readableDesc, rowClass) {
-    this._desc[name] = {
-      typeDesc: typeDesc,
-      defaultValue: defaultValue,
-      readableDesc: readableDesc,
-      rowClass: rowClass
+    if (!JsConfig.#isSet(typeDesc)) {
+      throw "Missing config item description";
+    }
+    this.#items[name] = {};
+    this.update(name, typeDesc, defaultValue, readableDesc, rowClass);
+    let item = this.#items[name];
+    item.value = defaultValue;
+    let cfg = this;
+    item.set = function(value) {
+      if (!item.typeDesc.isValid || item.typeDesc.isValid(value)) {
+        item.value = value;
+        cfg.change();
+      } else {
+        const msg = `Failed to set config ${name} to invalid value: ${value}`;
+        cfg.#error(msg);
+        return msg;
+      }
     };
-    this._[name] = defaultValue;
+    this.#addProperty(name);
+    // notify changes
+    this.change();
+    return this;
+  }
+
+/**
+ * Updates one or several attributes of a config entry
+ * Triggers the change listener invocation.
+ *
+ * @param {string} name - Name of the config item
+ * @param {object} [typeDesc] - Type of the config value
+ * @param {boolean|string|number|array} defaultValue - Default config value
+ * @param {string} [readableDesc] - Description for this config entry, will be displayed as a tooltip
+ * @param {string} [rowClass] - HTML class of the table row for this config
+ * @returns this
+ */
+  update(name, typeDesc, defaultValue, readableDesc, rowClass) {
+    let item = this.#items[name];
+    if (!item) {
+      throw "This config item does not exist";
+    }
+    if (JsConfig.#isSet(typeDesc)) {
+      item.typeDesc = typeDesc;
+    }
+    if (JsConfig.#isSet(defaultValue)) {
+      if (!item.typeDesc.isValid || item.typeDesc.isValid(defaultValue)) {
+        item.defaultValue = defaultValue;
+      } else {
+        let msg = `Default value for ${name} is invalid: ${defaultValue}`;
+        this.#error(msg);
+      }
+    }
+    if (JsConfig.#isSet(readableDesc)) {
+      item.readableDesc = readableDesc;
+    }
+    if (JsConfig.#isSet(rowClass)) {
+      item.rowClass = rowClass;
+    }
     // notify changes
     this.change();
     return this;
@@ -64,7 +155,8 @@ class JsConfig {
    */
   static boolType() {
     return {
-      type: JsConfig.#TYPE_BOOL
+      type: JsConfig.#TYPE_BOOL,
+      isValid: v => typeof(v) === "boolean"
     };
   }
 
@@ -77,12 +169,23 @@ class JsConfig {
   static textType(pattern) {
     return {
       type: JsConfig.#TYPE_TEXT,
-      pattern: pattern
+      pattern: pattern,
+      isValid: v => {
+        if (typeof (v) !== "string") {
+          return false;
+        }
+        if (pattern) {
+          if (!new RegExp(pattern).test(v)) {
+            return false;
+          }
+        }
+        return true;
+      }
     };
   }
 
   /**
-   * Creates an list type description. 
+   * Creates an list type description.
    * Selected configuration must be exactly one value of the listed values.
    *
    * @param  {...any} values - list of possible string values
@@ -91,7 +194,10 @@ class JsConfig {
   static listType(...values) {
     return {
       type: JsConfig.#TYPE_LIST,
-      values: values
+      values: values,
+      isValid: v => {
+        return (values.indexOf(v) >= 0);
+      }
     };
   }
 
@@ -114,7 +220,24 @@ class JsConfig {
       multiple: true,
       min: min,
       max: max,
-      eq: (v1, v2) => JSON.stringify(v1?.toSorted()) == JSON.stringify(v2?.toSorted())
+      eq: (v1, v2) => JSON.stringify(v1?.toSorted()) == JSON.stringify(v2?.toSorted()),
+      isValid: v => {
+        if (!Array.isArray(v)) {
+          return false;
+        }
+        if (JsConfig.#isNum(min) && v.length < min) {
+          return false;
+        }
+        if (JsConfig.#isNum(max) && v.length > max) {
+          return false;
+        }
+        for(const element of v) {
+          if (!values.includes(element)) {
+            return false;
+          }
+        }
+        return true;
+      }
     };
   }
 
@@ -131,7 +254,13 @@ class JsConfig {
       type: JsConfig.#TYPE_NUM,
       min: min,
       max: max,
-      step: step
+      step: step,
+      isValid: v => {
+        return (this.#isNum(v)
+          && (!this.#isNum(min) || v >= min)
+          && (!this.#isNum(max) || v <= max)
+        );
+      }
     };
   }
 
@@ -145,6 +274,13 @@ class JsConfig {
    * @returns this
    */
   setConfig(newConfig) {
+    if (!newConfig) {
+      // empty config
+      console.warn("No stored configuration, using defaults");
+      // abort
+      return this;
+
+    };
     if (typeof newConfig == "string" && newConfig) {
       try {
         newConfig = JSON.parse(newConfig);
@@ -155,19 +291,21 @@ class JsConfig {
     }
     if (newConfig &&
       // ony load compatible config version
-      (!this._._version || (this._._version == newConfig._version))) {
+      (!this.#items._version || (this.#items._version.value == newConfig._version))) {
       let isChanged = false;
-      let _desc = this._desc;
-      let _ = this._;
       for (let name in newConfig) {
         const value = newConfig[name];
-        if (typeof _desc[name] !== "undefined") {
-          isChanged = _desc[name]?.eq ? !_desc[name]?.eq(_[name], value) : _[name] != value;
-          _[name] = value;
+        const item = this.#items[name];
+        if (item.typeDesc) {
+          isChanged = item?.eq ? !item?.eq(item.value, value) : item.value != value;
+          item.set(value);
         }
       }
       // notify changes
       isChanged && this.change();
+    } else {
+      let msg = `Cannot load incompatible config v${this.#items._version}`;
+      this.#error(msg);
     }
     return this;
   }
@@ -179,10 +317,9 @@ class JsConfig {
    * @returns this
    */
   resetToDefault() {
-    this._ = {};
-    let _ = this._;
-    for (let name in this._desc) {
-      _[name] = this._desc[name].defaultValue;
+    for (let name in this.#items) {
+      if (!this.#items[name].typeDesc) continue; // not an config item
+      this.#items[name].value = this.#items[name].defaultValue;
     }
     // notify changes
     this.change();
@@ -192,11 +329,11 @@ class JsConfig {
   /**
    * Defines the function to call when config values are changed
    *
-   * @param {function} fn - The change listener function (no arguments)
+   * @param {function} fn - The change listener function, which gets the new json config as argument
    * @returns this
    */
   onChange(fn) {
-    this._options.listener = fn;
+    this.#options.changeListener = fn;
     return this;
   }
 
@@ -207,10 +344,28 @@ class JsConfig {
    */
   change() {
     // notify changes
-    if (this._options.listener) {
-      this._options.listener(this._);
+    if (this.#options?.changeListener) {
+      this.#options.changeListener(this.toJSON());
     }
     return this;
+  }
+
+  /**
+   * Defines the function to call when an error is detected while processing the configuration
+   *
+   * @param {function} fn - The error listener function, which gets an error message as argument
+   * @returns this
+   */
+  onError(fn) {
+    this.#options.errorListener = fn;
+    return this;
+  }
+
+  #error(msg) {
+    console.error(msg);
+    if (this.#options?.errorListener) {
+      this.#options.errorListener(msg);
+    }
   }
 
   /**
@@ -222,22 +377,21 @@ class JsConfig {
    */
   showConfigTable(table, readonly) {
     table.innerHTML = "";
-    let _ = this._;
-    this._table = table;
     const tbody = table.createTBody();
     let jsc = this;
-    for (let name in this._desc) {
-      const desc = this._desc[name];
-      const trClass = desc.rowClass ? `class="${desc.rowClass}"` : "";
+    for (let name in this.#items) {
+      const item = this.#items[name];
+      if (!item.typeDesc) continue; // not an application config item
+      const trClass = item.rowClass ? `class="${item.rowClass}"` : "";
       tbody.insertAdjacentHTML("beforeend", `<tr ${trClass} id="jsconfig-row-${name}"></tr>`);
       const tr = table.querySelector("tr:last-child");
-      const shownName = this._options?.capitalize ?
+      const shownName = this.#options?.capitalize ?
         (name.charAt(0).toUpperCase() + name.slice(1)).replaceAll("-", " ")
         : name;
-      tr.insertAdjacentHTML("beforeend", `<td title="${desc.readableDesc}">${shownName}:</td>`);
+      tr.insertAdjacentHTML("beforeend", `<td title="${item.readableDesc}">${shownName}:</td>`);
       let input;
-      let val = _[name];
-      let type = desc.typeDesc;
+      let val = this.#items[name].value;
+      let type = item.typeDesc;
       switch (type.type) {
 
         case JsConfig.#TYPE_BOOL:
@@ -296,10 +450,10 @@ class JsConfig {
           throw "Invalid type: " + type;
       }
 
-      tr.insertAdjacentHTML("beforeend", `<td title="${desc.readableDesc}">${input}</td>`);
-      desc.input = tr.querySelector("#" + name);
-      if (jsc._options?.autoSave) {
-        desc.input.addEventListener("change", () => { jsc.readConfigTable(); });
+      tr.insertAdjacentHTML("beforeend", `<td title="${item.readableDesc}">${input}</td>`);
+      item.input = tr.querySelector("#" + name);
+      if (jsc.#options?.autoSave) {
+        item.input.addEventListener("change", () => { jsc.readConfigTable(); });
       }
     }
     return this;
@@ -316,68 +470,45 @@ class JsConfig {
     if (!table) {
       table = this._table;
     }
-    let _ = this._;
-    for (const name in this._desc) {
-      const desc = this._desc[name];
-      let input = desc.input;
-      let type = desc.typeDesc;
+    for (const name in this.#items) {
+      const item = this.#items[name];
+      let input = item.input;
+      let type = item.typeDesc;
+      if (!type) continue; // not a config item
       let v;
 
-      try {
+      switch (type.type) {
 
-        switch (type.type) {
+        case JsConfig.#TYPE_BOOL:
+          v = input.checked;
+          break;
 
-          case JsConfig.#TYPE_BOOL:
-            v = input.checked;
-            break;
+        case JsConfig.#TYPE_TEXT:
+          v = input.value.trim();
+          break;
 
-          case JsConfig.#TYPE_TEXT:
-            v = input.value.trim();
-            if (type.pattern) {
-              if (!new RegExp(type.pattern).test(v)) {
-                throw `Should match the pattern "${type.pattern}"`;
-              }
-            }
-            break;
+        case JsConfig.#TYPE_NUM:
+          v = parseFloat(input.value);
+          break;
 
-          case JsConfig.#TYPE_NUM:
-            v = parseFloat(input.value);
-            if (
-              (isNaN(v)) ||
-              (JsConfig.#isNum(type.min) && v < type.min) ||
-              (JsConfig.#isNum(type.max) && v > type.max)
-            ) {
-              throw `"${v}" not in valid range (${type.min} to ${type.max})`;
-            }
-            break;
+        case JsConfig.#TYPE_LIST:
+          if (type.multiple) {
+            v = [];
+            document.querySelectorAll(`#${input.id} option:checked`).forEach(option => {
+              v.push(option.value);
+            });
+          } else {
+            v = input.value;
+          }
+          break;
 
-          case JsConfig.#TYPE_LIST:
-            if (type.multiple) {
-              v = [];
-              document.querySelectorAll(`#${input.id} option:checked`).forEach(option => {
-                v.push(option.value);
-              });
-              if (JsConfig.#isNum(type.min) && v.length < type.min) {
-                throw `At least ${type.min} value must be selected`;
-              }
-              if (JsConfig.#isNum(type.max) && v.length > type.max) {
-                throw `There cannot be more than ${type.max} value selected`;
-              }
-            } else {
-              v = input.value;
-              if (type.values.indexOf(v) < 0) {
-                throw `"${v}" is not a valid value`;
-              }
-            }
-            break;
+        default:
+          throw "Unknown type: " + type;
+      }
 
-          default:
-            throw "Unknown type: " + type;
-        }
+      let error = this.#items[name].set(v);
 
-        _[name] = v;
-
-      } catch (error) {
+      if (error) {
         input.focus && input.focus();
         throw `Cannot set "${name}" value: ${error}`;
       }
