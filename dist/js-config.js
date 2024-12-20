@@ -296,7 +296,7 @@ class JsConfig {
       for (let name in newConfig) {
         const value = newConfig[name];
         const item = this.#items[name];
-        if (item.typeDesc) {
+        if (item?.typeDesc) {
           isChanged = item?.eq ? !item?.eq(item.value, value) : item.value != value;
           item.set(value);
         }
