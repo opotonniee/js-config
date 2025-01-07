@@ -39,6 +39,7 @@ class JsConfig {
   }
 
   #v = {};
+
   /**
    * Getter to access getter and setter for each config values. For example:
    *   <configObject>.value.<configName> // returns the <configName> value
@@ -66,10 +67,12 @@ class JsConfig {
    * Return a cloned copy of the full config object value
    */
   toJSON() {
-    const res={};
+    const res = {};
     for (let name in this.#items) {
-      let val = this.#items[name].value;
-      res[name] = Array.isArray(val) ? [...val] : val;
+      if (this.#items.hasOwnProperty(name)) {
+        let val = this.#items[name].value;
+        res[name] = Array.isArray(val) ? [...val] : val;
+      }
     }
     return res;
   }

@@ -105,7 +105,11 @@
 
             
 
-            <td class="description last">Optional object with optional settings:<br> - listener {function} - callback when config is updated through the UI - autoSave {boolean} - Automatically save UI changes<br> - capitalize {boolean} - Capitalize 1st letter of setting name in table - version {integer} - config compatible version. See <a href="JsConfig.html#setConfig">JsConfig#setConfig</a></td>
+            <td class="description last">Optional object with optional settings:<br>
+ - listener {function} - callback when config is updated through the UI
+ - autoSave {boolean} - Automatically save UI changes<br>
+ - capitalize {boolean} - Capitalize 1st letter of setting name in table
+ - version {integer} - config compatible version. See <a href="JsConfig.html#setConfig">JsConfig#setConfig</a></td>
         </tr>
 
     
@@ -192,6 +196,74 @@
     
 
     
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="value"><span class="type-signature"></span>value<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    Getter to access getter and setter for each config values. For example:
+  <configObject>.value.<configName> // returns the <configName> value
+  <configObject>.value.<configName> = 3 // sets the <configName> value, and persist it. Throws an error is value does not comply to the configuration definition.
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line48">line 48</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -210,7 +282,8 @@
 
 
 <div class="description">
-    Declares an additional config entry, setting initial/default values.Triggers the change listener invocation.
+    Declares an additional config entry, setting initial/default values.
+Triggers the change listener invocation.
 </div>
 
 
@@ -303,7 +376,8 @@
 
             
 
-            <td class="description last">Type of the config value, as returned by                    boolType(), textType(), numType(), listType(), or listMultiType()</td>
+            <td class="description last">Type of the config value, as returned by
+                    boolType(), textType(), numType(), listType(), or listMultiType()</td>
         </tr>
 
     
@@ -323,6 +397,9 @@
 |
 
 <span class="param-type">number</span>
+|
+
+<span class="param-type">array</span>
 
 
             
@@ -447,7 +524,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line47">line 47</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line92">line 92</a>
     </li></ul></dd>
     
 
@@ -545,7 +622,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line208">line 208</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line351">line 351</a>
     </li></ul></dd>
     
 
@@ -651,7 +728,7 @@
 
             
 
-            <td class="description last">The change listener function (no arguments)</td>
+            <td class="description last">The change listener function, which gets the new json config as argument</td>
         </tr>
 
     
@@ -692,7 +769,154 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line198">line 198</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line341">line 341</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    this
+</div>
+
+
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="onError"><span class="type-signature"></span>onError<span class="signature">(fn)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Defines the function to call when an error is detected while processing the configuration
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fn</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The error listener function, which gets an error message as argument</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line365">line 365</a>
     </li></ul></dd>
     
 
@@ -746,7 +970,8 @@
 
 
 <div class="description">
-    Sets the config with the value from the table.Triggers the change listener invocation.
+    Sets the config with the value from the table.
+Triggers the change listener invocation.
 </div>
 
 
@@ -839,7 +1064,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line315">line 315</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line475">line 475</a>
     </li></ul></dd>
     
 
@@ -893,7 +1118,8 @@
 
 
 <div class="description">
-    Resets the config to the default values.Triggers the change listener invocation.
+    Resets the config to the default values.
+Triggers the change listener invocation.
 </div>
 
 
@@ -937,7 +1163,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line181">line 181</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line325">line 325</a>
     </li></ul></dd>
     
 
@@ -991,7 +1217,10 @@
 
 
 <div class="description">
-    Sets the config with pre-defined values, overriding defaults.If the JsConfig object has a version, the setting is only applied ifthe newConfig object has the same version value.Triggers the change listener invocation when changes were applied.
+    Sets the config with pre-defined values, overriding defaults.
+If the JsConfig object has a version, the setting is only applied if
+the newConfig object has the same version value.
+Triggers the change listener invocation when changes were applied.
 </div>
 
 
@@ -1084,7 +1313,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line147">line 147</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line282">line 282</a>
     </li></ul></dd>
     
 
@@ -1286,7 +1515,392 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line223">line 223</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line384">line 384</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    this
+</div>
+
+
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="toJSON"><span class="type-signature"></span>toJSON<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Return a cloned copy of the full config object value
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line69">line 69</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="update"><span class="type-signature"></span>update<span class="signature">(name, typeDesc<span class="signature-attributes">opt</span>, defaultValue, readableDesc<span class="signature-attributes">opt</span>, rowClass<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Updates one or several attributes of a config entry
+Triggers the change listener invocation.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Name of the config item</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>typeDesc</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Type of the config value</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>defaultValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+|
+
+<span class="param-type">string</span>
+|
+
+<span class="param-type">number</span>
+|
+
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Default config value</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>readableDesc</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Description for this config entry, will be displayed as a tooltip</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>rowClass</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">HTML class of the table row for this config</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line130">line 130</a>
     </li></ul></dd>
     
 
@@ -1384,7 +1998,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line65">line 65</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line162">line 162</a>
     </li></ul></dd>
     
 
@@ -1438,7 +2052,8 @@
 
 
 <div class="description">
-    Creates a multi-list type descriptionSelected configuration can be 0 to N values of the listed values.
+    Creates a multi-list type description
+Selected configuration can be 0 to N values of the listed values.
 </div>
 
 
@@ -1607,7 +2222,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line107">line 107</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line219">line 219</a>
     </li></ul></dd>
     
 
@@ -1661,7 +2276,8 @@
 
 
 <div class="description">
-    Creates an list type description. Selected configuration must be exactly one value of the listed values.
+    Creates an list type description.
+Selected configuration must be exactly one value of the listed values.
 </div>
 
 
@@ -1766,7 +2382,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line91">line 91</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line200">line 200</a>
     </li></ul></dd>
     
 
@@ -1991,7 +2607,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line129">line 129</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line258">line 258</a>
     </li></ul></dd>
     
 
@@ -2150,7 +2766,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line77">line 77</a>
+        <a href="js-config.js.html">js-config.js</a>, <a href="js-config.js.html#line175">line 175</a>
     </li></ul></dd>
     
 
@@ -2212,7 +2828,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Dec 12 2024 11:44:52 GMT+0100 (heure normale d’Europe centrale)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Jan 07 2025 22:57:46 GMT+0100 (Central European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
