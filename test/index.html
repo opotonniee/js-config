@@ -28,7 +28,6 @@
       
       function refreshAutoSave(newValue) {
         if (newValue != autosave) {
-          console.log(newValue);
           $("#save").prop("disabled", newValue);
           createConfig(newValue);
           return true;

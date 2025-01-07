@@ -15,6 +15,7 @@ class JsConfig {
 
   static #isNum(value) { return typeof value === 'number'; }
   static #isSet(value) { return value !== null && value !== undefined; }
+  static #isItemEq(item, value) { return item?.eq ? item.eq(item.value, value) : item.value === value; }
 
   #options;
   #items;
@@ -94,19 +95,21 @@ class JsConfig {
     let item = this.#items[name];
     item.value = defaultValue;
     let cfg = this;
-    item.set = function(value) {
+    item.set = function(value, silent) {
       if (!item.typeDesc.isValid || item.typeDesc.isValid(value)) {
-        item.value = value;
-        cfg.change();
+        if (!JsConfig.#isItemEq(item, value)) {
+          item.value = value;
+          // notify change if needed
+          silent || cfg.change();
+        }
       } else {
         const msg = `Failed to set config ${name} to invalid value: ${value}`;
         cfg.#error(msg);
         return msg;
       }
     };
+    item.set(defaultValue, true);
     this.#addProperty(name);
-    // notify changes
-    this.change();
     return this;
   }
 
@@ -297,8 +300,8 @@ class JsConfig {
         const value = newConfig[name];
         const item = this.#items[name];
         if (item?.typeDesc) {
-          isChanged = item?.eq ? !item?.eq(item.value, value) : item.value != value;
-          item.set(value);
+          isChanged = !JsConfig.#isItemEq(item, value);
+          item.set(value, true);
         }
       }
       // notify changes
@@ -416,15 +419,15 @@ class JsConfig {
           } else {
             let attrs = "";
             if (JsConfig.#isNum(type.min)) {
-              attrs += " min=${type.min}";
+              attrs += ` min=${type.min}`;
             }
             if (JsConfig.#isNum(type.max)) {
-              attrs += " max=${type.max}";
+              attrs += ` max=${type.max}`;
             }
             if (typeof type.step != undefined) {
-              attrs += " step=${type.step}";
+              attrs += ` step=${type.step}`;
             }
-            input = `<input id="${name}" type="number" value="${val}"/>`;
+            input = `<input id="${name}" type="number" value="${val}" ${attrs}/>`;
           }
           break;
 
@@ -470,6 +473,7 @@ class JsConfig {
     if (!table) {
       table = this._table;
     }
+    let changed = false;
     for (const name in this.#items) {
       const item = this.#items[name];
       let input = item.input;
@@ -506,7 +510,11 @@ class JsConfig {
           throw "Unknown type: " + type;
       }
 
-      let error = this.#items[name].set(v);
+      let error;
+      if (!JsConfig.#isItemEq(this.#items[name], v)) {
+        error = this.#items[name].set(v, true);
+        changed = true;
+      }
 
       if (error) {
         input.focus && input.focus();
@@ -515,7 +523,7 @@ class JsConfig {
 
     }
     // notify changes
-    this.change();
+    changed && this.change();
     return this;
   }
 
