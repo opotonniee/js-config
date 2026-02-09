@@ -107,7 +107,7 @@ class JsConfig {
         }
       } else {
         const msg = `Failed to set config ${name} to invalid value: ${value}`;
-        cfg.#error(msg);
+        cfg.#error(msg, { target: name, invalid: value });
         return msg;
       }
     };
@@ -140,7 +140,7 @@ class JsConfig {
         item.defaultValue = defaultValue;
       } else {
         let msg = `Default value for ${name} is invalid: ${defaultValue}`;
-        this.#error(msg);
+        this.#error(msg, { target: name, invalid: defaultValue });
       }
     }
     if (JsConfig.#isSet(readableDesc)) {
@@ -367,10 +367,10 @@ class JsConfig {
     return this;
   }
 
-  #error(msg) {
+  #error(msg, data) {
     console.error(msg);
     if (this.#options?.errorListener) {
-      this.#options.errorListener(msg);
+      this.#options.errorListener(msg, data);
     }
   }
 
