@@ -99,16 +99,16 @@ class JsConfig {
     item.value = defaultValue;
     let cfg = this;
     item.set = function(value, silent) {
-      if (!item.typeDesc.isValid || item.typeDesc.isValid(value)) {
-        if (!JsConfig.#isItemEq(item, value)) {
+      if (!JsConfig.#isItemEq(item, value)) {
+        if (!item.typeDesc.isValid || item.typeDesc.isValid(value)) {
           item.value = value;
           // notify change if needed
           silent || cfg.change();
+        } else {
+          const msg = `Failed to set config ${name} to invalid value: ${value}`;
+          cfg.#error(msg);
+          return msg;
         }
-      } else {
-        const msg = `Failed to set config ${name} to invalid value: ${value}`;
-        cfg.#error(msg);
-        return msg;
       }
     };
     item.set(defaultValue, true);
