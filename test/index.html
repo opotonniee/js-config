@@ -57,8 +57,7 @@
       jsCfg.readConfigTable(cfgTable);
     });
     $("#reset").on("click", () => {
-      jsCfg.resetToDefault();
-      location.reload();
+      jsCfg.resetToDefault(true);
     });
 
   });

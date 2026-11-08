@@ -320,12 +320,16 @@ class JsConfig {
    * Resets the config to the default values.
    * Triggers the change listener invocation.
    *
+   * @param {boolean} [updateUI] - if true, the config table will be updated with the default values
    * @returns this
    */
-  resetToDefault() {
+  resetToDefault(updateUI) {
     for (let name in this.#items) {
       if (!this.#items[name].typeDesc) continue; // not an config item
       this.#items[name].value = this.#items[name].defaultValue;
+    }
+    if (updateUI && this._table) {
+      this.showConfigTable(this._table, this._isReadOnly);
     }
     // notify changes
     this.change();
@@ -382,6 +386,9 @@ class JsConfig {
    * @returns this
    */
   showConfigTable(table, readonly) {
+    this._table = table;
+    this._isReadOnly = readonly;
+
     table.innerHTML = "";
     const tbody = table.createTBody();
     let jsc = this;
